@@ -4,4 +4,4 @@ module add --name=org.postgresql --resources=/tmp/install/db-driver.jar --depend
 
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
 
-/subsystem=datasources/data-source="PostgresDataSource":add(jta="true",use-ccm="false",use-java-context="true",enabled="true",jndi-name=java:/jdbc/PostgresDataSource,max-pool-size=10,min-pool-size=5,flush-strategy="FailingConnectionOnly",driver-name=postgresql,connection-url=jdbc:postgresql://postgresDB:5432/postgres,user-name="postgres",password="password")
+/subsystem=datasources/data-source="PostgresDataSource":add(jta="true",use-ccm="false",use-java-context="true",enabled="true",jndi-name=java:/jdbc/PostgresDataSource,max-pool-size=10,min-pool-size=5,flush-strategy="FailingConnectionOnly",driver-name=postgresql,connection-url=jdbc:postgresql://${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${env.POSTGRES_DB},user-name="${env.POSTGRES_USER}",password="${env.POSTGRES_PASSWORD}")

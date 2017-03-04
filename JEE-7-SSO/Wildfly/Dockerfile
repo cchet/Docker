@@ -23,6 +23,7 @@ COPY ${PREPARE_CLI} /tmp/install/install-offline.cli
 COPY ${START_SCRIPT} /tmp/start.sh
 
 RUN dos2unix /tmp/start.sh
+RUN dos2unix /tmp/install/*.cli
 RUN chmod +x /tmp/start.sh
 RUN tar -xzf /tmp/install/keycloak-wildfly-adapter-dist.tar.gz -C ${JBOSS_HOME}
 RUN chown -R jboss:jboss /tmp/install

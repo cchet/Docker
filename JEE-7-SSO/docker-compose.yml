@@ -1,51 +1,42 @@
 version : "2.1"
 services:
-    postgresData:
+    postgres-data:
         image: 
             busybox:latest
-    postgresKeycloakData:
-        image: 
-            busybox:latest
-    postgresDB:
-        image:
-            postgres:9.5.6
+    postgres:
+        build:
+            context: ./Postgres
+            dockerfile: Dockerfile
         ports:
             - "5432:5432"
         environment:
-            - POSTGRES_PASSWORD=password
-        volumes_from:
-            - postgresData
-        depends_on:
-            - postgresData
-    postgresKeycloakDB:
-        image:
-            jboss/keycloak-postgres:2.5.4.Final
-        ports:
-            - "5433:5432"
-        environment:
-            - POSTGRES_DATABASE=keycloak -
-            - POSTGRES_USER=keycloak
+            - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password
             - POSTGRES_ROOT_PASSWORD=password
+            - POSTGRES_DB=postgres
+            - DB_USERS=keycloak=keycloak,wildfly=wildfly
+            - DB_NAMES=keycloakDB=keycloak,wildflyDB=wildfly
         volumes_from:
-            - postgresKeycloakData
+            - postgres-data
         depends_on:
-            - postgresKeycloakData
-    keycloak:
+            - postgres-data
+    keycloak-postgres:
         image:
-            jboss/keycloak:2.5.4.Final
-        depends_on:
-            - postgresKeycloakDB
-        links:
-            - postgresKeycloakDB
+            jboss/keycloak-postgres:2.5.4.Final
+        environment:
+            - KEYCLOAK_USER=admin
+            - KEYCLOAK_PASSWORD=admin
+            - POSTGRES_DATABASE=keycloakdb
+            - POSTGRES_USER=keycloak
+            - POSTGRES_PASSWORD=keycloak
+            - POSTGRES_PORT_5432_TCP_ADDR=postgres
+            - POSTGRES_PORT_5432_TCP_PORT=5432
         ports:
             - "8081:8080"
-        environment:
-             - KEYCLOAK_USER=admin
-             - KEYCLOAK_PASSWORD=admin
-             - POSTGRES_DATABASE=keycloak
-             - POSTGRES_USER=keycloak
-             - POSTGRES_PASSWORD=password
+        volumes_from:
+            - postgres
+        depends_on:
+            - postgres
     sso-wildfly-dev:
         build:
             context: ./Wildfly
@@ -62,8 +53,14 @@ services:
         environment:
             - ADMIN_USER=admin
             - ADMIN_PASSWORD=password
+            - POSTGRES_DB=wildflydb
+            - POSTGRES_USER=wildfly
+            - POSTGRES_PASSWORD=wildfly
+            - POSTGRES_HOST=postgres
+            - POSTGRES_PORT=5432
+            - jsf.ProjectStage=Development
         depends_on:
-            - postgresDB
-            - keycloak
+            - postgres
+            - keycloak-postgres
         links:
-            - "postgresDB:postgresDB"
+            - postgres

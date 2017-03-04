@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 USER_ADMIN="${ADMIN_USER?admin}"
 USER_ADMIN_PASSWORD="${ADMIN_PASSWORD?admin}"
 
