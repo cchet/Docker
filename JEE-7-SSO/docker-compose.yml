@@ -1,0 +1,69 @@
+version : "2.1"
+services:
+    postgresData:
+        image: 
+            busybox:latest
+    postgresKeycloakData:
+        image: 
+            busybox:latest
+    postgresDB:
+        image:
+            postgres:9.5.6
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_PASSWORD=password
+        volumes_from:
+            - postgresData
+        depends_on:
+            - postgresData
+    postgresKeycloakDB:
+        image:
+            jboss/keycloak-postgres:2.5.4.Final
+        ports:
+            - "5433:5432"
+        environment:
+            - POSTGRES_DATABASE=keycloak -
+            - POSTGRES_USER=keycloak
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_ROOT_PASSWORD=password
+        volumes_from:
+            - postgresKeycloakData
+        depends_on:
+            - postgresKeycloakData
+    keycloak:
+        image:
+            jboss/keycloak:2.5.4.Final
+        depends_on:
+            - postgresKeycloakDB
+        links:
+            - postgresKeycloakDB
+        ports:
+            - "8081:8080"
+        environment:
+             - KEYCLOAK_USER=admin
+             - KEYCLOAK_PASSWORD=admin
+             - POSTGRES_DATABASE=keycloak
+             - POSTGRES_USER=keycloak
+             - POSTGRES_PASSWORD=password
+    sso-wildfly-dev:
+        build:
+            context: ./Wildfly
+            dockerfile: Dockerfile
+            args:
+                - DB_DRIVER_URL=https://jdbc.postgresql.org/download/postgresql-42.0.0.jar
+                - PREPARE_CLI=install-offline-dev.cli
+                - START_SCRIPT=start-dev.sh
+        image: sso-wildfly
+        ports:
+            - "8080:8080"
+            - "8787:8787"
+            - "9990:9990"
+        environment:
+            - ADMIN_USER=admin
+            - ADMIN_PASSWORD=password
+        depends_on:
+            - postgresDB
+            - keycloak
+        links:
+            - "postgresDB:postgresDB"

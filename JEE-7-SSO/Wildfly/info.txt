@@ -1,0 +1,17 @@
+
+# How to use CLI to add subsystem
+# https://docs.jboss.org/author/display/WFLY10/CLI+Recipes#CLIRecipes-Adding%2CreadingandremovingsystempropertyusingCLI
+# keycloak client adaptor
+# https://downloads.jboss.org/keycloak/2.5.4.Final/adapters/keycloak-oidc/keycloak-wildfly-adapter-dist-2.5.4.Final.zip
+
+# Postgres jdbc driver
+# https://jdbc.postgresql.org/download/postgresql-42.0.0.jar
+# install driver via 
+# module add --name=com.oracle --resources=[path-to-driver]/ojdbc6.jar --dependencies=javax.api,javax.transaction.api
+
+/subsystem=datasources/jdbc-driver=oracle:add(driver-name=oracle,driver-module-name=com.oracle,driver-xa-datasource-class-name=oracle.jdbc.driver.OracleDriver)
+
+/subsystem=datasources/data-source="[NAME]":add(jta="true",use-ccm="true",use-java-context="true",enabled="true",jndi-name=java:/jdbc/[NAME],max-pool-size=10,min-pool-size=5,flush-strategy="FailingConnectionOnly",driver-name=oracle,connection-url=jdbc:oracle:thin:@[HOST_NAME]:1521:[SID],user-name="[user]",password="[password]")
+
+# Docker commands
+docker run -d --name sso-wildfly-dev -e "ADMIN_USER=admin" -e "ADMIN_PASSWORD=password" -p 8080:8080 -p 8787:8787 -p 9990:9990 sso-wildfly
