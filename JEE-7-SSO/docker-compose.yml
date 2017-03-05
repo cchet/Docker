@@ -2,41 +2,30 @@ version : "2.1"
 services:
     postgres-data:
         image: 
-            busybox:latest
+            busybox:1.26.2
     postgres:
         build:
             context: ./Postgres
             dockerfile: Dockerfile
         ports:
             - "5432:5432"
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=password
-            - POSTGRES_ROOT_PASSWORD=password
-            - POSTGRES_DB=postgres
-            - DB_USERS=keycloak=keycloak,wildfly=wildfly
-            - DB_NAMES=keycloakDB=keycloak,wildflyDB=wildfly
         volumes_from:
             - postgres-data
         depends_on:
             - postgres-data
+        env_file:
+            - ./postgres-secrets.properties
     keycloak-postgres:
         image:
             jboss/keycloak-postgres:2.5.4.Final
-        environment:
-            - KEYCLOAK_USER=admin
-            - KEYCLOAK_PASSWORD=admin
-            - POSTGRES_DATABASE=keycloakdb
-            - POSTGRES_USER=keycloak
-            - POSTGRES_PASSWORD=keycloak
-            - POSTGRES_PORT_5432_TCP_ADDR=postgres
-            - POSTGRES_PORT_5432_TCP_PORT=5432
         ports:
             - "8081:8080"
         volumes_from:
             - postgres
         depends_on:
             - postgres
+        env_file:
+            - ./keycloak-postgres-secrets.properties
     sso-wildfly-dev:
         build:
             context: ./Wildfly
@@ -50,17 +39,10 @@ services:
             - "8080:8080"
             - "8787:8787"
             - "9990:9990"
-        environment:
-            - ADMIN_USER=admin
-            - ADMIN_PASSWORD=password
-            - POSTGRES_DB=wildflydb
-            - POSTGRES_USER=wildfly
-            - POSTGRES_PASSWORD=wildfly
-            - POSTGRES_HOST=postgres
-            - POSTGRES_PORT=5432
-            - jsf.ProjectStage=Development
         depends_on:
             - postgres
             - keycloak-postgres
         links:
             - postgres
+        env_file:
+            - ./wildfly-secrets.properties
