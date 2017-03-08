@@ -1,0 +1,4 @@
+# Backup db
+ docker exec  -e ACTION=EXPORT postgres bash /tmp/backup.sh
+# Restore db
+ docker exec  -e ACTION=IMPORT -e FILE_NAME=<FILE_NAME> postgres bash /tmp/backup.sh

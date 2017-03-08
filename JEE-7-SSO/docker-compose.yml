@@ -1,9 +1,13 @@
 version : "2.1"
 services:
     postgres-data:
+        container_name: 
+            postgres-data
         image: 
             busybox:1.26.2
     postgres:
+        container_name: 
+            postgres
         build:
             context: ./Postgres
             dockerfile: Dockerfile
@@ -11,22 +15,36 @@ services:
             - "5432:5432"
         volumes_from:
             - postgres-data
+        volumes:
+            - c:/Users/Thomas/docker-backup/jee-7-sso:/tmp/backups
         depends_on:
             - postgres-data
         env_file:
             - ./postgres-secrets.properties
+        networks:
+            mynet:
+                 ipv4_address: 172.25.0.2
     keycloak-postgres:
+        container_name: 
+            keycloak-postgres
         image:
             jboss/keycloak-postgres:2.5.4.Final
         ports:
-            - "8081:8080"
+            - "8080:8080"
         volumes_from:
             - postgres
         depends_on:
             - postgres
+        environment:
+            - KEYCLOAK_LOGLEVEL=TRACE
         env_file:
             - ./keycloak-postgres-secrets.properties
+        networks:
+            mynet:
+                 ipv4_address: 172.25.0.3
     sso-wildfly-dev:
+        container_name: 
+            sso-wildfly-dev
         build:
             context: ./Wildfly
             dockerfile: Dockerfile
@@ -36,7 +54,7 @@ services:
                 - START_SCRIPT=start-dev.sh
         image: sso-wildfly
         ports:
-            - "8080:8080"
+            - "8081:8080"
             - "8787:8787"
             - "9990:9990"
         depends_on:
@@ -46,3 +64,12 @@ services:
             - postgres
         env_file:
             - ./wildfly-secrets.properties
+        networks:
+            mynet:
+                 ipv4_address: 172.25.0.4
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24

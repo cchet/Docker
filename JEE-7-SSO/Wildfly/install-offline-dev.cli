@@ -2,6 +2,9 @@ embed-server --server-config=standalone.xml
 
 module add --name=org.postgresql --resources=/tmp/install/db-driver.jar --dependencies=javax.api,javax.transaction.api
 
-/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
 
 /subsystem=datasources/data-source="PostgresDataSource":add(jta="true",use-ccm="false",use-java-context="true",enabled="true",jndi-name=java:/jdbc/PostgresDataSource,max-pool-size=10,min-pool-size=5,flush-strategy="FailingConnectionOnly",driver-name=postgresql,connection-url=jdbc:postgresql://${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${env.POSTGRES_DB},user-name="${env.POSTGRES_USER}",password="${env.POSTGRES_PASSWORD}")
+
+/subsystem=logging/logger=org.keycloak:add(level=DEBUG)
+/subsystem=logging/root-logger=ROOT:write-attribute(name="level", value="DEBUG") 
