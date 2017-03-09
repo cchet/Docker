@@ -1,0 +1,6 @@
+# CentOS with Oracle JDK
+
+This image depends on the following two arguments
+
+- *_JAVA_VERSION_* the java versions
+- *_BUILD_VERSION_* the build version

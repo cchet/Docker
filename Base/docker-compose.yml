@@ -1,0 +1,11 @@
+version: "2.1"
+services:
+    base-oracle-jdk8:
+        container_name: base-oracle-jdk8
+        image: base-oracle-jdk8
+        build:
+            context: ./OracleJdk
+            dockerfile: Dockerfile
+            args:
+                - JAVA_VERSION=8u121
+                - BUILD_VERSION=b13

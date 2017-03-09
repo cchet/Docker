@@ -1,0 +1,40 @@
+version: "2.1"
+services:
+    jboss-base:
+        container_name: jboss-base
+        image: jboss-base
+        build:
+            context: ./Jboss
+            dockerfile: Dockerfile
+    jboss-base-oracle-jdk8:
+        container_name: jboss-base-oracle-jdk8
+        image: jboss-base-oracle-jdk8
+        build:
+            context: ./OracleJdk
+            dockerfile: Dockerfile
+            args:
+                - JAVA_VERSION=8u60
+                - BUILD_VERSION=b27
+        depends_on:
+            - jboss-base
+    jboss-wildfly-oracle-jdk8:
+        container_name: jboss-wildfly-oracle-jdk8
+        image: jboss-wildfly-oracle-jdk8
+        build:
+            context: ./Wildfly
+            dockerfile: Dockerfile
+            args:
+                - WILDFLY_VERSION=10.1.0.Final
+                - WILDFLY_SHA1=9ee3c0255e2e6007d502223916cefad2a1a5e333
+        depends_on:
+            - jboss-base-oracle-jdk8
+    jboss-wildfly-keycloak-oracle-jdk8:
+        container_name: jboss-wildfly-keycloak-oracle-jdk8
+        image: jboss-wildfly-keycloak-oracle-jdk8
+        build:
+            context: ./Wildfly-Keycloak-Adaptor
+            dockerfile: Dockerfile
+            args:
+                - KEYCLOAK_VERSION=2.5.4.Final
+        depends_on:
+            - jboss-wildfly-oracle-jdk8

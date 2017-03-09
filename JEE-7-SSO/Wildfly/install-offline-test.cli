@@ -1,7 +1,0 @@
-embed-server --server-config=standalone.xml 
-
-module add --name=com.h2database.h2 --resources=/tmp/install/db-driver.jar --dependencies=javax.api,javax.transaction.api
-
-/subsystem=datasources/jdbc-driver=h2:add(driver-name=h2,driver-module-name=com.h2database.h2,driver-xa-datasource-class-name=org.h2.jdbcx.JdbcDataSource)
-
-s/subsystem=datasources/data-source="H2DataSource":add(jta="true",use-ccm="false",use-java-context="true",enabled="true",jndi-name=java:/jdbc/H2DataSource,max-pool-size=10,min-pool-size=5,flush-strategy="FailingConnectionOnly",driver-name=h2,connection-url=jdbc:h2:mem:test")

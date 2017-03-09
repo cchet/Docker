@@ -1,4 +1,4 @@
-FROM jboss/keycloak-adapter-wildfly:2.5.4.Final
+FROM jboss-wildfly-keycloak-oracle-jdk8
 MAINTAINER herzog.thomas81@gmail.com
  
 ARG PREPARE_CLI
@@ -8,26 +8,22 @@ ARG START_SCRIPT
 # Version Management
 ENV PROJECT_STAGE DEV
 
-USER root
+WORKDIR /tmp
 
-RUN yum -y install wget tar dos2unix
+RUN wget ${DB_DRIVER_URL} -O ./db-driver.jar
 
-RUN mkdir /tmp/install
-RUN wget ${DB_DRIVER_URL} -O /tmp/install/db-driver.jar
+COPY ${PREPARE_CLI} install-offline.cli
+COPY ${START_SCRIPT} start.sh
 
-COPY ${PREPARE_CLI} /tmp/install/install-offline.cli
-COPY ${START_SCRIPT} /tmp/start.sh
+USER root 
 
-RUN dos2unix /tmp/start.sh
-RUN dos2unix /tmp/install/*.cli
-RUN chmod +x /tmp/start.sh
-RUN chown -R jboss:jboss /tmp/install
+RUN dos2unix *.sh
+RUN dos2unix *.cli
+RUN chmod +x start.sh
 
-USER jboss
-
-RUN ${JBOSS_HOME}/bin/jboss-cli.sh --file=/tmp/install/install-offline.cli
-
-RUN rm -rf /tmp/install
+USER jboss 
+ 
+RUN ${JBOSS_HOME}/bin/jboss-cli.sh --file=/tmp/install-offline.cli
 
 CMD "/tmp/start.sh"
 
