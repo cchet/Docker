@@ -1,0 +1,21 @@
+version: "2.1"
+service:
+    jenkins-data:
+        container_name:
+           jenkins-data
+        image: 
+            busybox:1.26.2
+    jenkins:
+        container_name:
+            jenkins-data
+        image:
+            jenkins:2.32.3
+        ports:
+            - "8082:8080"
+            - "50000:50000"
+        volumes_from:
+            - jenkins-data
+        depends_on:
+            - jenkins-data
+        env_file:
+            - ./jenkins-secrets.properties

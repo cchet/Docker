@@ -64,6 +64,8 @@ services:
             - postgres
         env_file:
             - ./wildfly-secrets.properties
+        extra_hosts:
+            surface: 10.29.18.92
         networks:
             mynet:
                  ipv4_address: 172.25.0.4

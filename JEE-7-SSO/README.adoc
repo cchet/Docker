@@ -1,0 +1,36 @@
+# JEE-7 SSO Docker infrastructure
+
+This directory contains a docker infrastructure definition for a keycloak backed wildfly installation, for realizing SSO applications. The keycloak application and wildfly server are backed by an postgres database.
+
+## Postgres
+The directory _postgres_ contains the docker file which extends the official postgres _Dockerfile_ by adding 
+
+- a _backup.sh_ script which allows to export and import the single databases and
+- a _init-db.sh_ which allows to create multiple users and databases during initial startup
+
+This images relies on a provided _postgres-secrets.properties_ file, which provides the following environment variables:
+
+- *_POSTGRES_USER_*: the psotgres user name 
+- *_POSTGRES_PASSWORD_*: the postgres user password
+- *_POSTGRES_DB_*: the name of the default database
+- *_POSTGRES_ROOT_*: the postgres container root password
+- *_DB_USERS_*: Comma separated list of additional users (user=password)
+- *_DB_NAMES_*: Comma separated list of additional databases (database=user) +
+
+For backing up the database use the following command on the running _postgres_ container.
+
+[source,shell]
+----
+docker exec -e ACTION=EXPORT postgres bash /tmp/backup.sh
+----
+
+This will create the backup files for each database in the form of _dbname-20170308_232454.backup.sql_.
+
+For restoring a database froma backup file use the following command on the running _postgres_ container.
+
+[source,shell]
+----
+docker exec -e ACTION=IMPORT -e FILE_NAME=dbname-20170308_232454.backup.sql postgres bash /tmp/backup.sh
+----
+
+This will drop the database if exists and will import the database from the backup file.
